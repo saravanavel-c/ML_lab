@@ -1,0 +1,9 @@
+=== STUDENT ACTIVITY REPORT ===
+
+Student ID: S123
+Name: Saravanavel
+Total Logins: 1
+Total Submissions: 1
+
+=== DAILY ACTIVITY STATISTICS ===
+2026-01-06: 2 activities
