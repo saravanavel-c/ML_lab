@@ -4,6 +4,7 @@ import pandas as pd
 from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import r2_score, mean_squared_error
 
 def train_model():
     df = pd.read_csv("dataset.csv")
@@ -21,7 +22,12 @@ def train_model():
     model = LinearRegression()
     model.fit(X_train, y_train)
 
-    return model, le
+    y_pred = model.predict(X_test)
+
+    r2 = r2_score(y_test, y_pred)
+    mse = mean_squared_error(y_test, y_pred)
+
+    return model, le, r2, mse
 
 def predict(model, le, temp, humidity, size, ac_hours, city):
     city_encoded = le.transform([city])[0]

@@ -4,6 +4,7 @@ import pandas as pd
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score, precision_score, recall_score
 
 def train_model():
     df = pd.read_csv("dataset.csv")
@@ -24,7 +25,13 @@ def train_model():
     model = DecisionTreeClassifier()
     model.fit(X_train, y_train)
 
-    return model, le
+    y_pred = model.predict(X_test)
+
+    acc = accuracy_score(y_test, y_pred)
+    prec = precision_score(y_test, y_pred)
+    rec = recall_score(y_test, y_pred)
+
+    return model, le, acc, prec, rec
 
 def predict(model, le, temp, humidity, size, ac_hours, city):
     city_encoded = le.transform([city])[0]

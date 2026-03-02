@@ -5,6 +5,8 @@ from linear_regression import train_model as train_lr, predict as predict_lr
 from decision_tree import train_model as train_dt, predict as predict_dt
 from kmeans_clustering import train_model as train_km, predict as predict_km
 from pca_analysis import train_model as train_pca, transform as transform_pca
+from sklearn.metrics import silhouette_score
+
 
 st.title("⚡ Electricity Usage ML System")
 
@@ -25,8 +27,8 @@ if st.sidebar.button("Predict"):
     from sklearn.decomposition import PCA
 
     # Train supervised models
-    lr_model, lr_le = train_lr()
-    dt_model, dt_le = train_dt()
+    lr_model, lr_le, r2, mse = train_lr()
+    dt_model, dt_le, acc, prec, rec = train_dt()
 
     # Predict usage
     predicted_usage = predict_lr(lr_model, lr_le, temp, humidity, size, ac_hours, city)
@@ -44,10 +46,12 @@ if st.sidebar.button("Predict"):
     # Train KMeans
     kmeans = KMeans(n_clusters=3, random_state=42)
     df['cluster'] = kmeans.fit_predict(scaled_data)
+    sil_score = silhouette_score(scaled_data, df['cluster'])
 
     # Apply PCA for visualization
     pca = PCA(n_components=2)
     pca_data = pca.fit_transform(scaled_data)
+    explained_variance = pca.explained_variance_ratio_
 
     # Transform user input
     user_scaled = scaler.transform([[temp, humidity, ac_hours, predicted_usage]])
@@ -86,3 +90,19 @@ if st.sidebar.button("Predict"):
     ax.legend()
 
     st.pyplot(fig)
+    st.subheader("Model Evaluation Metrics")
+
+    st.write("📊 Linear Regression")
+    st.write("R² Score:", round(r2, 3))
+    st.write("MSE:", round(mse, 3))
+
+    st.write("📊 Decision Tree")
+    st.write("Accuracy:", round(acc, 3))
+    st.write("Precision:", round(prec, 3))
+    st.write("Recall:", round(rec, 3))
+
+    st.write("📊 KMeans")
+    st.write("Silhouette Score:", round(sil_score, 3))
+
+    st.write("📊 PCA")
+    st.write("Explained Variance Ratio:", explained_variance)
