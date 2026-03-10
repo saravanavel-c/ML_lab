@@ -24,11 +24,14 @@ def load_and_train_model():
     )
 
     model = MLPClassifier(
-        hidden_layer_sizes=(256, 128),
-        activation='relu',
-        solver='adam',
-        max_iter=15,
-        random_state=42
+    hidden_layer_sizes=(256,128),
+    activation='relu',
+    solver='adam',
+    max_iter=50,
+    batch_size=128,
+    learning_rate_init=0.001,
+    random_state=42,
+    verbose=True
     )
 
     model.fit(X_train, y_train)
@@ -53,7 +56,7 @@ st.subheader("Draw a Digit (0-9)")
 
 canvas_result = st_canvas(
     fill_color="black",
-    stroke_width=20,
+    stroke_width=5,
     stroke_color="white",
     background_color="black",
     height=280,
@@ -62,6 +65,7 @@ canvas_result = st_canvas(
     key="canvas",
 )
 
+st.markdown("---")
 if st.button("Predict Digit"):
 
     if canvas_result.image_data is not None:
@@ -72,18 +76,15 @@ if st.button("Predict Digit"):
             st.warning("Please draw a digit first.")
             st.stop()
 
-        # Convert to binary
-        _, img = cv2.threshold(img, 50, 255, cv2.THRESH_BINARY)
-
-        # Invert (MNIST style)
+        # Invert (MNIST = white digit on black)
         img = 255 - img
 
-        # Crop to digit area
-        coords = cv2.findNonZero(img)
+        # Crop to bounding box
+        coords = cv2.findNonZero(img.astype(np.uint8))
         x, y, w, h = cv2.boundingRect(coords)
         img = img[y:y+h, x:x+w]
 
-        # Resize longest side to 20 pixels
+        # Resize so longest side = 20 pixels
         if h > w:
             new_h = 20
             new_w = int(w * (20 / h))
@@ -93,13 +94,12 @@ if st.button("Predict Digit"):
 
         img = cv2.resize(img, (new_w, new_h), interpolation=cv2.INTER_AREA)
 
-        # Create 28x28 black image
+        # Create blank 28x28 image
         final_img = np.zeros((28, 28))
 
-        # Center digit
+        # Center the digit
         x_offset = (28 - new_w) // 2
         y_offset = (28 - new_h) // 2
-
         final_img[y_offset:y_offset+new_h, x_offset:x_offset+new_w] = img
 
         # Normalize
@@ -111,14 +111,35 @@ if st.button("Predict Digit"):
 
         st.success(f"Predicted Digit: {prediction[0]}")
 
-        # Probability bar
-        st.subheader("Prediction Probabilities")
         fig, ax = plt.subplots()
         ax.bar(range(10), probabilities[0])
         ax.set_xticks(range(10))
-        ax.set_xlabel("Digit")
-        ax.set_ylabel("Probability")
         st.pyplot(fig)
+st.subheader("Test Prediction")
+
+# Select image index
+index = st.slider("Select a test image index", 0, len(X_test)-1, 0)
+
+# Get image
+sample_image = X_test.iloc[index].values.reshape(28,28)
+true_label = y_test.iloc[index]
+
+# Display image
+st.image(sample_image, width=280, caption=f"Actual Label: {true_label}")
+
+# Predict
+if st.button("Predict the Image"):
+    prediction = model.predict(X_test.iloc[index].values.reshape(1,-1))
+    probabilities = model.predict_proba(X_test.iloc[index].values.reshape(1,-1))
+
+    st.success(f"Predicted Digit: {prediction[0]}")
+
+    fig4, ax4 = plt.subplots()
+    ax4.bar(range(10), probabilities[0])
+    ax4.set_xticks(range(10))
+    ax4.set_title("Prediction Probabilities")
+    st.pyplot(fig4)
+
 
 # -------------------------------
 # Model Evaluation Display
