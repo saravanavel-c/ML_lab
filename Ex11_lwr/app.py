@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import mean_squared_error, r2_score
 
 st.title("Locally Weighted Regression (LWR) - House Price Prediction")
-
 # -----------------------------
 # Load Dataset
 # -----------------------------
