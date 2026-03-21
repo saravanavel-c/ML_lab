@@ -1,0 +1,13 @@
+numpy
+pandas
+scikit-learn
+matplotlib
+streamlit
+gymnasium
+opencv-python
+tensorflow
+pgmpy
+networkx
+kagglehub
+streamlit-drawable-canvas
+joblib
