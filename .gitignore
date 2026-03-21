@@ -1,0 +1,22 @@
+touch .gitignore
+```
+
+Add what you want to ignore inside it. For your Python/Streamlit project:
+```
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Conda / Virtual environments
+envs/
+.env
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+Ex9_faceRec/dataset/
